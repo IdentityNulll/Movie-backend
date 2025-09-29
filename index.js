@@ -13,12 +13,17 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-
 app.use("/uploads", express.static("uploads"));
-
-
 app.use("/api", movieRoutes);
-
+app.use((err, req, res, next) => {
+  if (err.code === "LIMIT_FILE_SIZE") {
+    return res.status(400).json({ error: "File too large. Max size is 5GB." });
+  }
+  if (err.message === "Only image or video files allowed") {
+    return res.status(400).json({ error: err.message });
+  }
+  next(err);
+});
 
 mongoose
   .connect(process.env.MONGO_URI, {
