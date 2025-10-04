@@ -8,17 +8,29 @@ dotenv.config();
 
 const app = express();
 
-// ✅ Kengaytirilgan CORS sozlamasi (Netlify uchun ham ishlaydi)
+// ✅ Faqat localhost va Netlify domenlariga ruxsat beruvchi CORS
+const allowedOrigins = [
+  "http://localhost:5173",     // lokal frontend
+  "https://movie-crm.netlify.app", // Netlify frontend
+];
+
 app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "*"); // barcha domenlarga ruxsat
+  const origin = req.headers.origin;
+
+  if (allowedOrigins.includes(origin)) {
+    res.header("Access-Control-Allow-Origin", origin);
+  }
+
   res.header(
     "Access-Control-Allow-Headers",
     "Origin, X-Requested-With, Content-Type, Accept, Authorization"
   );
   res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+
   if (req.method === "OPTIONS") {
     return res.sendStatus(200);
   }
+
   next();
 });
 
@@ -28,7 +40,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/uploads", express.static("uploads"));
 app.use("/api", movieRoutes);
 
-// ✅ Fayl hajmi va turiga xatoliklarni ushlash
+// ✅ Fayl yuklashdagi xatoliklarni ushlash
 app.use((err, req, res, next) => {
   if (err.code === "LIMIT_FILE_SIZE") {
     return res.status(400).json({ error: "File too large. Max size is 5GB." });
@@ -39,6 +51,7 @@ app.use((err, req, res, next) => {
   next(err);
 });
 
+// ✅ MongoDB ulanish
 mongoose
   .connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
@@ -52,12 +65,6 @@ mongoose
     });
   })
   .catch((err) => console.error("❌ MongoDB connection error:", err));
-
-
-
-
-
-
 
 
 
