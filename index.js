@@ -11,9 +11,6 @@ const app = express();
 // ✅ CORS sozlamasi
 app.use(cors());
 
-// ✅ OPTIONS so‘rovlariga avtomatik javob
-app.options("*", cors());
-
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
