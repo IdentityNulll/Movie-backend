@@ -8,28 +8,8 @@ dotenv.config();
 
 const app = express();
 
-// ✅ Ruxsat berilgan domenlar
-const allowedOrigins = [
-  "http://localhost:5173",
-  "https://movie-crm.netlify.app",
-];
-
 // ✅ CORS sozlamasi
-app.use(
-  cors({
-    origin: function (origin, callback) {
-      // Postman yoki server ichki so‘rovlari uchun origin yo‘q bo‘lishi mumkin
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("CORS: This origin is not allowed"));
-      }
-    },
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Origin", "X-Requested-With", "Content-Type", "Accept", "Authorization"],
-    credentials: true,
-  })
-);
+app.use(cors());
 
 // ✅ OPTIONS so‘rovlariga avtomatik javob
 app.options("*", cors());
